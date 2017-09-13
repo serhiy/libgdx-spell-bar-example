@@ -19,6 +19,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 public class CooldownTimer extends Table {
 	
 	private static final float START_ANGLE = 90;
+	private static final int SCALE_FACTOR = 4;
 	
 	private final boolean clockwise;
 	
@@ -32,7 +33,7 @@ public class CooldownTimer extends Table {
 	 */
 	public CooldownTimer(boolean clockwise) {
 		this.clockwise = clockwise;
-		
+
 		cooldownDisplay = new Table();
 		cooldownDisplay.setPosition(0, 0);
 		addActor(cooldownDisplay);
@@ -65,11 +66,12 @@ public class CooldownTimer extends Table {
 			return null;
 		}
 		
-		float radius = Math.min(getWidth()/2, getHeight()/2);
+		float radius = Math.min(getWidth(), getHeight()) * SCALE_FACTOR / 2;
 		float angle = calculateAngle(remainingPercentage);
 		int segments = calculateSegments(angle);
 		
-		Pixmap display = new Pixmap((int) getWidth(), (int) getHeight(), Format.RGBA8888);
+		Pixmap display = new Pixmap((int) (getWidth() * SCALE_FACTOR), (int) (getHeight() * SCALE_FACTOR), Format.RGBA8888);
+		Pixmap finalDisplay = new Pixmap((int) getWidth(), (int) getHeight(), Format.RGBA8888);
 		
 		Blending blending = Pixmap.getBlending();
 		
@@ -88,15 +90,17 @@ public class CooldownTimer extends Table {
 				float temp = cx;
 				cx = cos * cx - sin * cy;
 				cy = sin * temp + cos * cy;
-				display.fillTriangle((int) getWidth()/2, (int) getHeight()/2, (int) (getWidth()/2 + pcx), (int) (getHeight()/2 + pcy), (int) (getWidth()/2 + cx), (int) (getHeight()/2 + cy));
+				display.fillTriangle((int) (getWidth() * SCALE_FACTOR / 2), (int) (getHeight() * SCALE_FACTOR / 2), (int) ((int) (getWidth() * SCALE_FACTOR / 2) + pcx), (int) (getHeight() * SCALE_FACTOR / 2 + pcy), (int) ((int) (getWidth() * SCALE_FACTOR / 2) + cx), (int) (getHeight() * SCALE_FACTOR / 2 + cy));
 			}
+			
+			finalDisplay.drawPixmap(display, 0, 0, (int)((getWidth() * SCALE_FACTOR / 2) - (getWidth() / 2)), (int)((getHeight() * SCALE_FACTOR / 2) - (getHeight() / 2)), (int) (getWidth()), (int) (getHeight()));
 
 			Pixmap.setBlending(Blending.None);
 
 			if (cooldownTexture == null) {
-				cooldownTexture = new TextureRegionDrawable(new TextureRegion(new Texture(display)));
+				cooldownTexture = new TextureRegionDrawable(new TextureRegion(new Texture(finalDisplay)));
 			} else {
-				cooldownTexture.getRegion().getTexture().draw(display, 0, 0);
+				cooldownTexture.getRegion().getTexture().draw(finalDisplay, 0, 0);
 			}
 
 			return cooldownTexture;
@@ -104,14 +108,15 @@ public class CooldownTimer extends Table {
 			Pixmap.setBlending(blending);
 			
 			display.dispose();
+			finalDisplay.dispose();
 		}
 	}
 	
 	private float calculateAngle(float remainingPercentage) {
 		if (clockwise) {
-			return 360 - 360 * remainingPercentage;
-		} else {
 			return 360 * remainingPercentage - 360;
+		} else {
+			return 360 - 360 * remainingPercentage;
 		}
 	}
 	

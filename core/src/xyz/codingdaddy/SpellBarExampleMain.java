@@ -9,6 +9,7 @@ import xyz.codingdaddy.hud.SpellBar;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 
@@ -16,17 +17,21 @@ public class SpellBarExampleMain extends ApplicationAdapter {
 
 	private Stage stage;
 	private SpellBar spellBar;
-	private List<Spell> spells = Arrays.asList(new Spell("", 10, new Action()),
-											   new Spell("", 10, new Action()));
+	private List<Spell> spells = Arrays.asList(new Spell("attack", 2, new Action()),
+											   new Spell("heal", 10, new Action()));
 
 	@Override
 	public void create () {
 		stage = new Stage();
 		
 		spellBar = new SpellBar(spells);
-		spellBar.setPosition(100, 100);
+		spellBar.setPosition(30, 0);
 
 		stage.addActor(spellBar);
+		
+		InputMultiplexer multiplexer = new InputMultiplexer();
+		Gdx.input.setInputProcessor(multiplexer);
+		multiplexer.addProcessor(stage);
 	}
 
 	@Override

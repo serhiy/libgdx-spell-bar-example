@@ -1,0 +1,47 @@
+
+hud.png
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+spellbar_background
+  rotate: false
+  xy: 1, 185
+  size: 579, 70
+  orig: 579, 70
+  offset: 0, 0
+  index: -1
+spellbar_frame
+  rotate: false
+  xy: 1, 113
+  size: 579, 70
+  orig: 579, 70
+  offset: 0, 0
+  index: -1
+attack_down
+  rotate: false
+  xy: 582, 201
+  size: 50, 54
+  orig: 50, 54
+  offset: 0, 0
+  index: -1
+attack_up
+  rotate: false
+  xy: 1, 57
+  size: 50, 54
+  orig: 50, 54
+  offset: 0, 0
+  index: -1
+heal_down
+  rotate: false
+  xy: 1, 1
+  size: 50, 54
+  orig: 50, 54
+  offset: 0, 0
+  index: -1
+heal_up
+  rotate: false
+  xy: 582, 145
+  size: 50, 54
+  orig: 50, 54
+  offset: 0, 0
+  index: -1

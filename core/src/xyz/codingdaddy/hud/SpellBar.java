@@ -10,6 +10,7 @@ import xyz.codingdaddy.GameTime;
 import xyz.codingdaddy.domain.Spell;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
@@ -43,12 +44,13 @@ public class SpellBar extends Table {
 			String spellName = spell.getName().toLowerCase();
 			SpellBarImageButton imageButton = new SpellBarImageButton(new TextureRegionDrawable(textureAtlas.findRegion(spellName + "_up")), new TextureRegionDrawable(textureAtlas.findRegion(spellName + "_down")), spell.getCooldown(), count);
 			imageButton.getStyle().imageDisabled = new TextureRegionDrawable(textureAtlas.findRegion(spellName + "_down"));
-			imageButton.setDisabled(true);
-			add(imageButton).padTop(-3).padLeft(7);
-				
+			imageButton.setPosition(7 + count * 57, 8);
+			addActor(imageButton);
+
 			imageButton.addListener(new ChangeListener() {
 				public void changed (ChangeEvent event, Actor actor) {
 					if (!((SpellBarImageButton)actor).isOnCooldown()) {
+						spell.getAction().execute(spell.getName());
 						((SpellBarImageButton)actor).setCooldownTriggerTime(GameTime.getCurrentTime());
 					}
 			    }
@@ -65,9 +67,7 @@ public class SpellBar extends Table {
 	
 	public void update() {
 		for (Entry<Spell, SpellBarImageButton> combatUnitBaseRecruitmentButton : spellBarButtons.entrySet()) {
-			if (combatUnitBaseRecruitmentButton.getValue().isOnCooldown()) {
-				combatUnitBaseRecruitmentButton.getValue().update();
-			}
+			combatUnitBaseRecruitmentButton.getValue().update();
 		}
 	}
 	
@@ -84,11 +84,11 @@ public class SpellBar extends Table {
 			super(imageUp, imageDown);
 			this.cooldown = cooldown;
 			this.index = index;
-			
+
 			this.cooldownTimer = new CooldownTimer(true);
-			//cooldownTimer.setPosition(* 57, 5);
-			cooldownTimer.setTouchable(Touchable.disabled);
-			cooldownTimer.setColor(1, 1, 1, 0.5f);
+			cooldownTimer.setSize(50, 54);
+			cooldownTimer.setPosition(0, 0);
+			cooldownTimer.setColor(Color.WHITE);
 			
 			addActor(this.cooldownTimer);
 		}
@@ -115,13 +115,18 @@ public class SpellBar extends Table {
 		
 		public float getRemainingCooldownPercentage() {
 			if (GameTime.getCurrentTime() - cooldownTriggerTime > cooldown) {
-				return 0f;
+				return 1.0f;
 			}
 			return (GameTime.getCurrentTime() - cooldownTriggerTime) / cooldown;
 		}
 		
 		public void update() {
-			cooldownTimer.update(getRemainingCooldownPercentage());
+			if (getRemainingCooldownPercentage() - EPSILON <= 1.0f) {
+				cooldownTimer.setVisible(true);
+				cooldownTimer.update(getRemainingCooldownPercentage());
+			} else {
+				cooldownTimer.setVisible(false);
+			}
 		}
 	}
 }

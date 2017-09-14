@@ -1,6 +1,10 @@
 package xyz.codingdaddy.domain;
 
-
+/**
+ * Represents the spell which can be performed in game.
+ * 
+ * @author serhiy
+ */
 public class Spell {
 	private String name;
 	private float cooldown;

@@ -13,6 +13,11 @@ import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 
+/**
+ * Application renderer.
+ * 
+ * @author serhiy
+ */
 public class SpellBarExampleMain extends ApplicationAdapter {
 
 	private Stage stage;

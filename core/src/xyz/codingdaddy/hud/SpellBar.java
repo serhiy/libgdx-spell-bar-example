@@ -1,11 +1,11 @@
 package xyz.codingdaddy.hud;
 
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import xyz.codingdaddy.Constants;
 import xyz.codingdaddy.GameTime;
 import xyz.codingdaddy.domain.Spell;
 
@@ -16,34 +16,43 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
+import com.badlogic.gdx.scenes.scene2d.ui.ImageButton.ImageButtonStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
-import com.badlogic.gdx.utils.Align;
 
+/**
+ * Represents the spell bar HUD component.
+ * 
+ * @author serhiy
+ */
 public class SpellBar extends Table {
 	
-	private static final float EPSILON = 0.00001f;
 	private static final int MAX_SLOTS = 10;
 	
 	private final Map<Spell, SpellBarImageButton> spellBarButtons = new HashMap<Spell, SpellBarImageButton>();
 
+	/**
+	 * @param spells to be added to the spell bar.
+	 */
 	public SpellBar(List<Spell> spells) {
 		super();
 		
-		TextureAtlas textureAtlas = new TextureAtlas(Gdx.files.internal("hud.pack"));
+		TextureAtlas textureAtlas = new TextureAtlas(Gdx.files.internal(Constants.TEXTURE_ATLAS_HUD));
 		
-		align(Align.left);
-		
-		setBackground(new TextureRegionDrawable(textureAtlas.findRegion("spellbar_background")));
+		setBackground(new TextureRegionDrawable(textureAtlas.findRegion(Constants.TEXTURE_ATLAS_HUD_SPELL_BAR_BACKGROUND)));
 		
 		for (int count = 0; count < Math.min(spells.size(), MAX_SLOTS); count ++) {
 			final Spell spell = spells.get(count);
 			
 			String spellName = spell.getName().toLowerCase();
-			SpellBarImageButton imageButton = new SpellBarImageButton(new TextureRegionDrawable(textureAtlas.findRegion(spellName + "_up")), new TextureRegionDrawable(textureAtlas.findRegion(spellName + "_down")), spell.getCooldown(), count);
-			imageButton.getStyle().imageDisabled = new TextureRegionDrawable(textureAtlas.findRegion(spellName + "_down"));
+			
+			ImageButtonStyle imageButtonStyle = new ImageButtonStyle();
+			imageButtonStyle.imageUp = new TextureRegionDrawable(textureAtlas.findRegion(spellName + Constants.TEXTURE_ATLAS_HUD_BUTTON_UP_SUFFIX));
+			imageButtonStyle.imageDown = new TextureRegionDrawable(textureAtlas.findRegion(spellName + Constants.TEXTURE_ATLAS_HUD_BUTTON_DOWN_SUFFIX));
+			imageButtonStyle.imageDisabled = new TextureRegionDrawable(textureAtlas.findRegion(spellName + Constants.TEXTURE_ATLAS_HUD_BUTTON_DOWN_SUFFIX));
+			
+			SpellBarImageButton imageButton = new SpellBarImageButton(imageButtonStyle, spell.getCooldown());
 			imageButton.setPosition(7 + count * 57, 8);
 			addActor(imageButton);
 
@@ -59,33 +68,38 @@ public class SpellBar extends Table {
 			spellBarButtons.put(spell, imageButton);
 		}
 
-		Image frame = new Image(textureAtlas.findRegion("spellbar_frame"));
+		Image frame = new Image(textureAtlas.findRegion(Constants.TEXTURE_ATLAS_HUD_SPELL_BAR_FRAME));
 		frame.setPosition(0, 0);
 		frame.setTouchable(Touchable.disabled);
 		addActor(frame);
 	}
 	
+	/**
+	 * Update the state of the spell bar.
+	 */
 	public void update() {
 		for (Entry<Spell, SpellBarImageButton> combatUnitBaseRecruitmentButton : spellBarButtons.entrySet()) {
 			combatUnitBaseRecruitmentButton.getValue().update();
 		}
 	}
 	
+	/**
+	 * Represents a button of the spell bar component.
+	 * 
+	 * @author serhiy
+	 */
 	class SpellBarImageButton extends ImageButton {
 
 		private final CooldownTimer cooldownTimer;
-		
 		private final float cooldown;
-		private final int index;
-
+		
 		private float cooldownTriggerTime = -Float.MAX_VALUE;
 		
-		public SpellBarImageButton(Drawable imageUp, Drawable imageDown, float cooldown, int index) {
-			super(imageUp, imageDown);
+		public SpellBarImageButton(ImageButtonStyle imageButtonStyle, float cooldown) {
+			super(imageButtonStyle);
 			this.cooldown = cooldown;
-			this.index = index;
 
-			this.cooldownTimer = new CooldownTimer(true);
+			this.cooldownTimer = new CooldownTimer(true, 50, 54);
 			cooldownTimer.setSize(50, 54);
 			cooldownTimer.setPosition(0, 0);
 			cooldownTimer.setColor(Color.WHITE);
@@ -94,7 +108,7 @@ public class SpellBar extends Table {
 		}
 
 		public boolean isOnCooldown() {
-			return getRemainingCooldownTime() - EPSILON > 0;
+			return getRemainingCooldownTime() - Constants.EPSILON > 0;
 		}
 
 		public float getCooldownTriggerTime() {
@@ -104,24 +118,20 @@ public class SpellBar extends Table {
 		public void setCooldownTriggerTime(float cooldownTriggerTime) {
 			this.cooldownTriggerTime = cooldownTriggerTime;
 		}
-		
-		public int getIndex() {
-			return index;
-		}
-		
+
 		public float getRemainingCooldownTime() {
 			return Math.max(0, cooldown - (GameTime.getCurrentTime() - cooldownTriggerTime));
 		}
 		
 		public float getRemainingCooldownPercentage() {
-			if (GameTime.getCurrentTime() - cooldownTriggerTime > cooldown) {
-				return 1.0f;
+			if ((cooldown - (GameTime.getCurrentTime() - cooldownTriggerTime)) <= 0) {
+				return 0.0f;
 			}
-			return (GameTime.getCurrentTime() - cooldownTriggerTime) / cooldown;
+			return (cooldown - (GameTime.getCurrentTime() - cooldownTriggerTime)) / cooldown;
 		}
 		
 		public void update() {
-			if (getRemainingCooldownPercentage() - EPSILON <= 1.0f) {
+			if (getRemainingCooldownPercentage() - Constants.EPSILON >= 0.0f) {
 				cooldownTimer.setVisible(true);
 				cooldownTimer.update(getRemainingCooldownPercentage());
 			} else {

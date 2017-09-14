@@ -1,5 +1,10 @@
 package xyz.codingdaddy;
 
+/**
+ * A simple game time controller which represents elapsed time.
+ * 
+ * @author serhiy
+ */
 public class GameTime {
 	
 	private static float currentTime = 0;
@@ -9,6 +14,6 @@ public class GameTime {
 	}
 	
 	static void updateCurrentTime(float addValue) {
-		currentTime = currentTime + addValue;
+		currentTime += addValue;
 	}
 }

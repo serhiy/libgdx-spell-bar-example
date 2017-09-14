@@ -77,9 +77,9 @@ public class SpellBar extends Table {
 	/**
 	 * Update the state of the spell bar.
 	 */
-	public void update() {
-		for (Entry<Spell, SpellBarImageButton> combatUnitBaseRecruitmentButton : spellBarButtons.entrySet()) {
-			combatUnitBaseRecruitmentButton.getValue().update();
+    public void update() {
+		for (SpellBarImageButton spellBarButton : spellBarButtons.values()) {
+			spellBarButton.update();
 		}
 	}
 	
@@ -100,7 +100,6 @@ public class SpellBar extends Table {
 			this.cooldown = cooldown;
 
 			this.cooldownTimer = new CooldownTimer(true, 50, 54);
-			cooldownTimer.setSize(50, 54);
 			cooldownTimer.setPosition(0, 0);
 			cooldownTimer.setColor(Color.WHITE);
 			

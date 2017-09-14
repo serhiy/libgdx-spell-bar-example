@@ -34,9 +34,7 @@ public class SpellBarExampleMain extends ApplicationAdapter {
 
 		stage.addActor(spellBar);
 		
-		InputMultiplexer multiplexer = new InputMultiplexer();
-		Gdx.input.setInputProcessor(multiplexer);
-		multiplexer.addProcessor(stage);
+		Gdx.input.setInputProcessor(stage);
 	}
 
 	@Override

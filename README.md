@@ -14,4 +14,4 @@ The components are packed using the Texture-Packer GUI: [https://code.google.com
 
 The graphical components for this example are taken from: [https://opengameart.org/content/spells-icons] (spell icons) and [https://opengameart.org/content/moderna-graphical-interface] (spell bar overlays)
 
-This tutorial is kindly provided by [Nuclear Pixels Project](www.nuclearpixels.com). Feel free to drop us a message!
+This tutorial is kindly provided by [Nuclear Pixels Project](http://www.nuclearpixels.com/). Feel free to drop us a message!
